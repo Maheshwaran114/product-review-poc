@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  title: Product Review POC API
+  description: API documentation for the Product Review POC.
+  version: "1.0.0"
+servers:
+  - url: http://localhost:3001
+paths:
+  /:
+    get:
+      summary: Root Endpoint
+      description: Returns a welcome message from the backend.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hello from the backend!
