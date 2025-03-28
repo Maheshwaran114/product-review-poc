@@ -1,20 +1,254 @@
 openapi: 3.0.0
 info:
   title: Product Review POC API
-  description: API documentation for the Product Review POC.
+  description: API documentation for the community-driven product review and aggregation platform.
   version: "1.0.0"
 servers:
   - url: http://localhost:3001
 paths:
-  /:
-    get:
-      summary: Root Endpoint
-      description: Returns a welcome message from the backend.
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        description: User registration details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+  /auth/login:
+    post:
+      summary: Login a user
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
       responses:
         '200':
-          description: Successful Response
+          description: Successful login, returns an authentication token
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: Hello from the backend!
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Unauthorized
+          
+  # Product Endpoints
+  /products:
+    get:
+      summary: Retrieve a list of products
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      summary: Create a new product (admin or integration only)
+      requestBody:
+        description: Product details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Product created
+  /products/{id}:
+    get:
+      summary: Retrieve product details by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the product
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+
+  # Review Endpoints
+  /products/{id}/reviews:
+    get:
+      summary: Retrieve reviews for a specific product
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Product ID
+      responses:
+        '200':
+          description: List of reviews for the product
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+    post:
+      summary: Submit a review for a specific product
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Product ID for which the review is submitted
+      requestBody:
+        description: Review details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Review created
+        '400':
+          description: Invalid review data
+
+  # Affiliate Endpoints
+  /affiliate/token:
+    post:
+      summary: Generate an affiliate tracking token
+      requestBody:
+        description: Request to generate an affiliate token
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AffiliateRequest'
+      responses:
+        '200':
+          description: Affiliate token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Affiliate'
+components:
+  schemas:
+    # User Registration/Login Schemas
+    UserRegistration:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - name
+        - email
+        - password
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+      required:
+        - id
+        - name
+        - email
+
+    # Product Schema
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+      required:
+        - name
+        - price
+
+    # Review Schema
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        productId:
+          type: integer
+        userId:
+          type: integer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+      required:
+        - productId
+        - userId
+        - rating
+
+    # Affiliate Schema and Request
+    AffiliateRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+      required:
+        - userId
+    Affiliate:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        token:
+          type: string
+      required:
+        - userId
+        - token
