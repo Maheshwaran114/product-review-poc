@@ -135,6 +135,8 @@ paths:
           description: Review created
         '400':
           description: Invalid review data
+        '500':
+          description: Server error
 
   # Affiliate Endpoints
   /affiliate/token:
@@ -154,6 +156,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Affiliate'
+        '400':
+          description: Invalid request data
+        '500':
+          description: Server error
 components:
   schemas:
     # User Registration/Login Schemas
@@ -207,6 +213,10 @@ components:
         price:
           type: number
           format: float
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
       required:
         - name
         - price
@@ -227,10 +237,17 @@ components:
           maximum: 5
         comment:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - productId
         - userId
         - rating
+        - comment
 
     # Affiliate Schema and Request
     AffiliateRequest:

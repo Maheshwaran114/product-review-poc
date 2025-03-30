@@ -1,0 +1,24 @@
+# Use official Node.js image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install -g prisma
+
+# Copy the rest of the backend source code
+COPY . .
+
+# Ensure environment variables are available inside container
+ENV NODE_ENV=development
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Expose the port the backend will run on
+EXPOSE 3001
+
+# Start the application
+CMD ["npm", "run", "dev"]

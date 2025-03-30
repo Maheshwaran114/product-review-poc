@@ -1,7 +1,17 @@
 {
-  "name": "frontend-app",
-  "version": "0.1.0",
+  "name": "product-review-frontend",
+  "version": "1.0.0",
   "private": true,
+  "proxy": "http://localhost:3001",
+  "description": "Frontend for the Product Review POC project built with React",
+  "main": "src/index.js",
+  "author": "Product Review POC Team",
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "product-review",
+    "frontend"
+  ],
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -17,6 +27,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "lint": "echo \"No linter configured\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -36,10 +47,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
-  "main": "index.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }

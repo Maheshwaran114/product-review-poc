@@ -1,0 +1,26 @@
+# Node modules
+**/node_modules
+**/npm-debug.log
+
+# Logs
+logs
+*.log
+
+# dotenv files (keep secrets out of Docker image)
+.env
+.env.*
+
+# OS metadata
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Editor files
+.vscode
+.idea
+
+# Build output
+**/build
+**/dist

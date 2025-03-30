@@ -1,70 +1,92 @@
-# Getting Started with Create React App
+# 🛍️ Product Review POC
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a full-stack Product Review Platform built as a Proof of Concept (POC). It enables users to browse products, view details, and submit reviews. The project uses a modern tech stack including **React**, **Express**, **PostgreSQL**, and **Prisma**, and is containerized with **Docker**.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📦 Project Structure
 
-### `npm start`
+```
+product-review-poc/
+├── backend/               # Node.js + Express + Prisma backend
+│   ├── src/
+│   └── prisma/
+├── frontend/
+│   └── frontend-app/      # React frontend
+└── docs/
+    └── api/openapi.yaml   # Swagger/OpenAPI Specification
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 Features
 
-### `npm test`
+- Product listing with detail view
+- Review submission with live form
+- Affiliate token generation (backend)
+- PostgreSQL + Prisma ORM
+- Fully documented REST API (OpenAPI Spec)
+- Responsive and styled UI
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🧪 Local Development
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Node.js v18+
+- PostgreSQL
+- Docker (optional for containerized setup)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Run Backend
 
-### `npm run eject`
+```bash
+cd backend
+npm install
+npx prisma migrate dev
+npx prisma db seed
+npm run dev
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Run Frontend
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+cd frontend/frontend-app
+npm install
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🌐 API Documentation
 
-## Learn More
+- OpenAPI YAML: `/docs/api/openapi.yaml`
+- You can view the documentation using [Swagger Editor](https://editor.swagger.io/)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🐳 Docker Support
 
-### Code Splitting
+```bash
+docker-compose up --build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+> Note: Dockerfiles are located in the root directory for both frontend and backend.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📂 Tech Stack
 
-### Making a Progressive Web App
+- Frontend: React, JSX, CSS Modules
+- Backend: Node.js, Express, Prisma ORM
+- Database: PostgreSQL
+- Docs: OpenAPI (Swagger)
+- Dev Tools: Docker, Postman, Prisma Studio
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 👥 Contributors
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Frontend Lead: [Your Name]
+- Backend Lead: [Your Name]
+- Product Owner: [Your Name]

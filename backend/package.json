@@ -1,22 +1,33 @@
 {
-  "name": "backend",
+  "name": "product-review-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Backend service for the Product Review POC project",
+  "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Add test script here\" && exit 0",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "node prisma/seed.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "express",
+    "prisma",
+    "product-review",
+    "backend"
+  ],
+  "author": "Product Review POC Team",
+  "license": "MIT",
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.2"
   },
-  "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "prisma": "^6.5.0"
   }
 }
