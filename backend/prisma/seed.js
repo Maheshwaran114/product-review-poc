@@ -2,56 +2,32 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Starting seeding...');
+  console.log('Starting affiliate seeding...');
 
-  const users = [];
-  const products = [];
+  // Retrieve all existing users
+  const users = await prisma.user.findMany();
 
-  // Create 20 users
-  for (let i = 1; i <= 20; i++) {
-    const user = await prisma.user.create({
-      data: {
-        name: `User ${i}`,
-        email: `user${i}@example.com`,
-        password: `password${i}`,
-      },
+  // For each user, create an affiliate record if one does not already exist
+  for (let i = 0; i < users.length; i++) {
+    const existingAffiliate = await prisma.affiliate.findFirst({
+      where: { userId: users[i].id },
     });
-    users.push(user);
+    if (!existingAffiliate) {
+      await prisma.affiliate.create({
+        data: {
+          token: `AFFILIATE_TOKEN_${i + 1}_${Date.now()}`,
+          userId: users[i].id,
+        },
+      });
+    }
   }
 
-  // Create 20 products
-  for (let i = 1; i <= 20; i++) {
-    const product = await prisma.product.create({
-      data: {
-        name: `Product ${i}`,
-        description: `Description for product ${i}`,
-        price: parseFloat((Math.random() * 100 + 10).toFixed(2)), // Random price between 10 and 110
-      },
-    });
-    products.push(product);
-  }
-
-  // Create 20 reviews (one for each product by random users)
-  for (let i = 0; i < 20; i++) {
-    const user = users[Math.floor(Math.random() * users.length)];
-    const product = products[i];
-
-    await prisma.review.create({
-      data: {
-        productId: product.id,
-        userId: user.id,
-        rating: Math.floor(Math.random() * 5) + 1, // 1 to 5
-        comment: `Review for product ${product.name} by ${user.name}`,
-      },
-    });
-  }
-
-  console.log('Seeding completed with 20 users, products, and reviews.');
+  console.log(`Affiliate seeding completed for ${users.length} users.`);
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Error during seeding:", e);
+    console.error('❌ Error during affiliate seeding:', e);
     process.exit(1);
   })
   .finally(async () => {

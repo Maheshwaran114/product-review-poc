@@ -15,7 +15,7 @@ COPY . .
 ENV NODE_ENV=development
 
 # Generate Prisma client
-RUN npx prisma generate
+RUN npx prisma generate --schema=./backend/prisma/schema.prisma
 
 # Expose the port the backend will run on
 EXPOSE 3001
