@@ -1,0 +1,111 @@
+/* Global CSS - frontend/frontend-app/src/styles/global.css */
+
+:root {
+    /* Colors */
+    --primary-color: #007bff;
+    --primary-color-hover: #0056b3;
+    --secondary-color: #28a745;
+    --background-color: #fff;
+    --light-background: #f2f2f2;
+    --border-color: #ccc;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+  
+    /* Spacing */
+    --spacing-small: 8px;
+    --spacing-medium: 16px;
+    --spacing-large: 24px;
+  
+    /* Typography */
+    --font-family-base: 'Roboto', sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+  
+    /* Border radius */
+    --border-radius: 8px;
+  }
+  
+  /* Global Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Base Styles */
+  body {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: #333;
+    background-color: var(--background-color);
+  }
+  
+  /* Utility Classes */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-medium);
+  }
+  
+  .mb-small {
+    margin-bottom: var(--spacing-small);
+  }
+  
+  .mb-medium {
+    margin-bottom: var(--spacing-medium);
+  }
+  
+  .mb-large {
+    margin-bottom: var(--spacing-large);
+  }
+  
+  /* Base Element Styling */
+  button, input, textarea {
+    font-family: inherit;
+  }
+  
+  button {
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-base);
+    margin-bottom: var(--spacing-medium);
+  }
+  
+  /* Links */
+  a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  a:hover {
+    color: var(--primary-color-hover);
+  }
+  
+  /* Form Elements */
+  input, textarea {
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-small);
+    border-radius: var(--border-radius);
+  }
+  
+  /* Responsive Breakpoints */
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px;
+    }
+    
+    .container {
+      padding: var(--spacing-small);
+    }
+  }
