@@ -10,8 +10,9 @@ const SearchBar = ({ onSearch }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    const trimmedQuery = query.trim();
     if (onSearch) {
-      onSearch(query);
+      onSearch(trimmedQuery);
     }
   };
 
@@ -22,6 +23,7 @@ const SearchBar = ({ onSearch }) => {
         placeholder="Search products..."
         value={query}
         onChange={handleInputChange}
+        aria-label="Search products"
       />
       <button type="submit">Search</button>
     </form>

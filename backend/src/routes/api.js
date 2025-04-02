@@ -3,13 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const router = express.Router();
 
-// Mock product data (if needed; can be removed once DB is used)
-const products = [
-  { id: 1, name: 'Product A', description: 'Description A', price: 29.99 },
-  { id: 2, name: 'Product B', description: 'Description B', price: 49.99 },
-];
-
-// GET /api/products with pagination
+// GET /api/products with pagination and optional search filtering
 router.get('/products', async (req, res, next) => {
   try {
     // Get pagination parameters from query; default to page 1, 10 items per page
@@ -17,11 +11,16 @@ router.get('/products', async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     
-    // Fetch products with pagination and order by creation date descending
+    // Get search query if provided
+    const searchQuery = req.query.search;
+    const whereClause = searchQuery ? { name: { contains: searchQuery, mode: 'insensitive' } } : undefined;
+    
+    // Fetch products with pagination, optional search filter, and order by creation date ascending
     const products = await prisma.product.findMany({
+      where: whereClause,
       skip,
       take: limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'asc' }
     });
     res.status(200).json(products);
   } catch (error) {

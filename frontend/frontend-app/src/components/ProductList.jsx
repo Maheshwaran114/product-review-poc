@@ -6,18 +6,24 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(10); // Number of products per page
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Fetch products whenever page or search changes
   useEffect(() => {
     fetchProducts();
-  }, [page]);
+  }, [page, search]);
 
   const fetchProducts = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/products?page=${page}&limit=${limit}`);
+      let url = `/api/products?page=${page}&limit=${limit}`;
+      if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
+      }
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
@@ -44,9 +50,28 @@ const ProductList = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(1); // Reset to first page on search change
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // fetchProducts is triggered automatically by useEffect when 'search' state changes
+  };
+
   return (
     <div className="product-list">
       <h2>Product List</h2>
+      <form onSubmit={handleSearchSubmit} className="search-form">
+        <input 
+          type="text" 
+          placeholder="Search products..." 
+          value={search} 
+          onChange={handleSearchChange}
+        />
+        <button type="submit">Search</button>
+      </form>
       {loading && <p>Loading products...</p>}
       {error && <p className="error">{error}</p>}
       <div className="product-grid">

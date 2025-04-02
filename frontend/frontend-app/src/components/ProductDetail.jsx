@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import ReviewForm from './ReviewForm';
+import SearchBar from './SearchBar';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
   const { id } = useParams(); // Get product id from URL parameters
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loadingProduct, setLoadingProduct] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [error, setError] = useState(null);
+
+  // Function to handle search action; navigates to the product list with a search query
+  const handleSearch = (query) => {
+    navigate(`/products?search=${encodeURIComponent(query)}`);
+  };
 
   // Fetch product details from the API
   const fetchProduct = async () => {
@@ -43,7 +50,7 @@ const ProductDetail = () => {
     setLoadingReviews(false);
   };
 
-  // Run fetch operations when the component mounts or the id changes
+  // Run fetch operations when the component mounts or when the id changes
   useEffect(() => {
     fetchProduct();
     fetchReviews();
@@ -51,6 +58,9 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail">
+      {/* SearchBar integrated at the top for searching products */}
+      <SearchBar onSearch={handleSearch} />
+
       {loadingProduct ? (
         <p>Loading product details...</p>
       ) : error ? (
