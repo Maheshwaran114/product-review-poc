@@ -11,7 +11,8 @@ const ProductDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [loadingProduct, setLoadingProduct] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
-  const [error, setError] = useState(null);
+  const [errorProduct, setErrorProduct] = useState(null);
+  const [errorReviews, setErrorReviews] = useState(null);
 
   // Function to handle search action; navigates to the product list with a search query
   const handleSearch = (query) => {
@@ -21,6 +22,7 @@ const ProductDetail = () => {
   // Fetch product details from the API
   const fetchProduct = async () => {
     setLoadingProduct(true);
+    setErrorProduct(null);
     try {
       const res = await fetch(`/api/products/${id}`);
       if (!res.ok) {
@@ -29,7 +31,7 @@ const ProductDetail = () => {
       const data = await res.json();
       setProduct(data);
     } catch (err) {
-      setError(err.message);
+      setErrorProduct(err.message);
     }
     setLoadingProduct(false);
   };
@@ -37,6 +39,7 @@ const ProductDetail = () => {
   // Fetch reviews for the product from the API
   const fetchReviews = async () => {
     setLoadingReviews(true);
+    setErrorReviews(null);
     try {
       const res = await fetch(`/api/products/${id}/reviews`);
       if (!res.ok) {
@@ -45,7 +48,7 @@ const ProductDetail = () => {
       const data = await res.json();
       setReviews(data);
     } catch (err) {
-      setError(err.message);
+      setErrorReviews(err.message);
     }
     setLoadingReviews(false);
   };
@@ -61,10 +64,15 @@ const ProductDetail = () => {
       {/* SearchBar integrated at the top for searching products */}
       <SearchBar onSearch={handleSearch} />
 
+      {/* Back button for navigation */}
+      <button onClick={() => navigate(-1)} className="back-button">
+        Back to Products
+      </button>
+
       {loadingProduct ? (
         <p>Loading product details...</p>
-      ) : error ? (
-        <p className="error">{error}</p>
+      ) : errorProduct ? (
+        <p className="error">{errorProduct}</p>
       ) : product ? (
         <div className="product-info">
           <h2>{product.name}</h2>
@@ -79,6 +87,8 @@ const ProductDetail = () => {
         <h3>Reviews</h3>
         {loadingReviews ? (
           <p>Loading reviews...</p>
+        ) : errorReviews ? (
+          <p className="error">{errorReviews}</p>
         ) : reviews.length > 0 ? (
           <ul>
             {reviews.map(review => (

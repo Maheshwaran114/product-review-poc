@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ProductCard from './ProductCard';
+import SearchBar from './SearchBar';
 import './ProductList.css';
 
 const ProductList = () => {
@@ -8,14 +9,12 @@ const ProductList = () => {
   const [limit] = useState(10); // Number of products per page
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
+  const loader = useRef(null);
 
-  // Fetch products whenever page or search changes
-  useEffect(() => {
-    fetchProducts();
-  }, [page, search]);
-
-  const fetchProducts = async () => {
+  // Function to fetch products; if reset is true, replaces current products
+  const fetchProducts = async (reset = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -28,62 +27,79 @@ const ProductList = () => {
         throw new Error('Failed to fetch products');
       }
       const data = await response.json();
-      setProducts(data);
+      if (reset) {
+        setProducts(data);
+      } else {
+        setProducts(prev => [...prev, ...data]);
+      }
+      // If fewer products than limit, assume no more products are available
+      setHasMore(data.length === limit);
     } catch (err) {
       setError(err.message);
     }
     setLoading(false);
   };
 
-  const handleProductClick = (id) => {
-    // Implement navigation or detailed view logic here
-    console.log('Product clicked with ID:', id);
-  };
+  // Reset products and page when search query changes
+  useEffect(() => {
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+    fetchProducts(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
-  const handleNextPage = () => {
-    setPage(prev => prev + 1);
-  };
+  // Fetch more products when page changes (except when page is 1 which is handled in the search effect)
+  useEffect(() => {
+    if (page === 1) return;
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(prev => prev - 1);
+  // Intersection Observer for infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          setPage(prev => prev + 1);
+        }
+      },
+      { threshold: 1 }
+    );
+    if (loader.current) {
+      observer.observe(loader.current);
     }
-  };
+    return () => {
+      if (loader.current) {
+        observer.unobserve(loader.current);
+      }
+    };
+  }, [hasMore, loading]);
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    setPage(1); // Reset to first page on search change
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    // fetchProducts is triggered automatically by useEffect when 'search' state changes
+  // Handle search query from SearchBar component
+  const handleSearch = (query) => {
+    setSearch(query);
   };
 
   return (
     <div className="product-list">
-      <h2>Product List</h2>
-      <form onSubmit={handleSearchSubmit} className="search-form">
-        <input 
-          type="text" 
-          placeholder="Search products..." 
-          value={search} 
-          onChange={handleSearchChange}
-        />
-        <button type="submit">Search</button>
-      </form>
-      {loading && <p>Loading products...</p>}
-      {error && <p className="error">{error}</p>}
+      {/* Sticky SearchBar positioned in the middle of the page */}
+      <div className="search-bar-container">
+        <SearchBar onSearch={handleSearch} />
+      </div>
       <div className="product-grid">
         {products.map(product => (
-          <ProductCard key={product.id} product={product} onClick={handleProductClick} />
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            onClick={(id) => console.log('Product clicked:', id)} 
+          />
         ))}
       </div>
-      <div className="pagination">
-        <button onClick={handlePrevPage} disabled={page === 1}>Prev</button>
-        <span>Page {page}</span>
-        <button onClick={handleNextPage}>Next</button>
-      </div>
+      {error && <p className="error">{error}</p>}
+      {loading && <p>Loading...</p>}
+      {/* Loader element for triggering infinite scroll */} 
+      <div ref={loader} className="loader"></div>
     </div>
   );
 };
