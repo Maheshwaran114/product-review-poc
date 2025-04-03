@@ -61,8 +61,10 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail">
-      {/* SearchBar integrated at the top for searching products */}
-      <SearchBar onSearch={handleSearch} />
+      {/* Container for SearchBar to aid styling */}
+      <div className="search-container">
+        <SearchBar onSearch={handleSearch} />
+      </div>
 
       {/* Back button for navigation */}
       <button onClick={() => navigate(-1)} className="back-button">

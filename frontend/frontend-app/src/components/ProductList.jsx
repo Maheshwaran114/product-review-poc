@@ -64,7 +64,10 @@ const ProductList = () => {
           setPage(prev => prev + 1);
         }
       },
-      { threshold: 1 }
+      {
+        threshold: 0.5,       // Trigger when 50% of the loader is visible
+        rootMargin: '100px',  // Trigger earlier by adding margin around the viewport
+      }
     );
     if (loader.current) {
       observer.observe(loader.current);

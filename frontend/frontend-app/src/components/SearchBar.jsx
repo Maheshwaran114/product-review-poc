@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import './SearchBar.css';
 
 const SearchBar = ({ onSearch }) => {
@@ -6,11 +7,13 @@ const SearchBar = ({ onSearch }) => {
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
+    console.log('SearchBar: Input changed, query:', e.target.value);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
     const trimmedQuery = query.trim();
+    console.log('SearchBar: Search initiated with query:', trimmedQuery);
     if (onSearch) {
       onSearch(trimmedQuery);
     }
@@ -28,6 +31,10 @@ const SearchBar = ({ onSearch }) => {
       <button type="submit">Search</button>
     </form>
   );
+};
+
+SearchBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
 };
 
 export default SearchBar;
