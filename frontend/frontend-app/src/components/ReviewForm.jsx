@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ReviewForm.css';
+import '../styles/ReviewForm.css';
 
 const ReviewForm = ({ productId, onSuccess }) => {
   const [review, setReview] = useState({ userId: '', rating: '', comment: '' });

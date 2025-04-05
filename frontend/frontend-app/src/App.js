@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import ProductList from './pages/ProductList';
-import ProductDetail from './pages/ProductDetail';
+import ProductDetailPage from './pages/ProductDetailPage'; // Updated import
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/products" replace />} />
         <Route path="/products" element={<ProductList />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} /> {/* Updated route */}
       </Routes>
     </div>
   );
