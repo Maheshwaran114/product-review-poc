@@ -1,124 +1,125 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import ReviewForm from '../components/ReviewForm';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
-import '../styles/ProductDetail.css';
+import '../styles/ProductList.css';
 
-const ProductDetailPage = () => {
-  const { id } = useParams(); // Get product id from URL parameters
+const ProductList = () => {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  const [search, setSearch] = useState(initialSearch);
+  const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10); // Number of products per page
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(null);
+  const loader = useRef(null);
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
-  const [reviews, setReviews] = useState([]);
-  const [loadingProduct, setLoadingProduct] = useState(true);
-  const [loadingReviews, setLoadingReviews] = useState(true);
-  const [errorProduct, setErrorProduct] = useState(null);
-  const [errorReviews, setErrorReviews] = useState(null);
 
-  // Handle search action; navigates to the product list with a search query
-  const handleSearch = (query) => {
-    navigate(`/products?search=${encodeURIComponent(query)}`);
-  };
-
-  // Fetch product details from the API
-  const fetchProduct = async () => {
-    setLoadingProduct(true);
-    setErrorProduct(null);
+  // Function to fetch products
+  const fetchProducts = async (reset = false) => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(`/api/products/${id}`);
-      if (!res.ok) {
-        throw new Error('Failed to fetch product');
+      let url = `/api/products?page=${page}&limit=${limit}`;
+      if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
       }
-      const data = await res.json();
-      setProduct(data);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const data = await response.json();
+      if (reset) {
+        setProducts(data);
+      } else {
+        setProducts(prev => [...prev, ...data]);
+      }
+      // If fewer products than limit, assume no more products are available
+      setHasMore(data.length === limit);
     } catch (err) {
-      setErrorProduct(err.message);
+      setError(err.message);
     }
-    setLoadingProduct(false);
+    setLoading(false);
   };
 
-  // Fetch reviews for the product from the API
-  const fetchReviews = async () => {
-    setLoadingReviews(true);
-    setErrorReviews(null);
-    try {
-      const res = await fetch(`/api/products/${id}/reviews`);
-      if (!res.ok) {
-        throw new Error('Failed to fetch reviews');
-      }
-      const data = await res.json();
-      setReviews(data);
-    } catch (err) {
-      setErrorReviews(err.message);
-    }
-    setLoadingReviews(false);
-  };
-
-  // Run fetch operations when the component mounts or when the id changes
+  // When search query changes, reset products and page number
   useEffect(() => {
-    fetchProduct();
-    fetchReviews();
-  }, [id]);
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+    fetchProducts(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  // Fetch more products when page changes (for pages > 1)
+  useEffect(() => {
+    if (page === 1) return;
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  // Intersection Observer for infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          setPage(prev => prev + 1);
+        }
+      },
+      {
+        threshold: 0.5,
+        rootMargin: '100px',
+      }
+    );
+    if (loader.current) {
+      observer.observe(loader.current);
+    }
+    return () => {
+      if (loader.current) {
+        observer.unobserve(loader.current);
+      }
+    };
+  }, [hasMore, loading]);
+
+  // Handle search action
+  const handleSearch = (query) => {
+    setSearch(query);
+    // The useEffect will handle resetting and fetching the products when 'search' changes
+  };
+
+  // Handle product click to navigate to detail page
+  const handleProductClick = (id) => {
+    navigate(`/product/${id}`);
+  };
 
   return (
-    <div className="product-detail">
-      {/* Container for the SearchBar */}
+    <div className="product-list">
+      {/* SearchBar integration */}
       <div className="search-container">
         <SearchBar onSearch={handleSearch} />
       </div>
-
-      {/* Back button for navigation */}
-      <button onClick={() => navigate(-1)} className="back-button">
-        Back to Products
-      </button>
-
-      {loadingProduct ? (
-        <p>Loading product details...</p>
-      ) : errorProduct ? (
-        <p className="error">{errorProduct}</p>
-      ) : product ? (
-        <div className="product-info">
-          <h2>{product.name}</h2>
-          <p>{product.description}</p>
-          <p>
-            <strong>Price:</strong> ${product.price.toFixed(2)}
-          </p>
-        </div>
-      ) : (
-        <p>Product not found.</p>
-      )}
-
-      <div className="reviews-section">
-        <h3>Reviews</h3>
-        {loadingReviews ? (
-          <p>Loading reviews...</p>
-        ) : errorReviews ? (
-          <p className="error">{errorReviews}</p>
-        ) : reviews.length > 0 ? (
-          <ul>
-            {reviews.map((review) => (
-              <li key={review.id}>
-                <p>
-                  <strong>Rating:</strong> {review.rating}
-                </p>
-                <p>{review.comment}</p>
-                <p>
-                  <em>{new Date(review.createdAt).toLocaleString()}</em>
-                </p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No reviews yet.</p>
-        )}
+      
+      <h2>Available Products</h2>
+      
+      <div className="product-grid">
+        {products.map(product => (
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            onClick={handleProductClick} 
+          />
+        ))}
       </div>
-
-      <div className="review-form-section">
-        <h3>Submit a Review</h3>
-        {/* onSuccess callback refetches reviews after a new submission */}
-        <ReviewForm productId={id} onSuccess={fetchReviews} />
-      </div>
+      
+      {error && <p className="error">{error}</p>}
+      {loading && <p>Loading...</p>}
+      
+      {/* Loader element for triggering infinite scroll */}
+      <div ref={loader} className="loader"></div>
     </div>
   );
 };
 
-export default ProductDetailPage;
+export default ProductList;
