@@ -12,30 +12,44 @@ jobs:
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
     steps:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Set up Node
+      # Backend steps
+      - name: Set up Node for backend
         uses: actions/setup-node@v2
         with:
           node-version: 16
-
-      - name: Install dependencies
+      - name: Install dependencies (backend)
+        working-directory: backend
         run: npm install
-
-      - name: Run tests
+      - name: Run tests (backend)
+        working-directory: backend
         run: npm test
 
+      # Frontend steps
+      - name: Set up Node for frontend
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install dependencies (frontend)
+        working-directory: frontend/frontend-app
+        run: npm install
+      - name: Run tests (frontend)
+        working-directory: frontend/frontend-app
+        run: npm test
+
+      # Build Docker images using Docker Compose
       - name: Build Docker images
         run: docker-compose build
 
+      # Log in to Docker Hub (if credentials are provided)
       - name: Log in to Docker Hub
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        run: |
-          echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
+        run: echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
 
+      # Push Docker images (if credentials are provided)
       - name: Push Docker images
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         run: docker-compose push
