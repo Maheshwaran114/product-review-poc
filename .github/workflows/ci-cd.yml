@@ -46,10 +46,10 @@ jobs:
 
       # Log in to Docker Hub if credentials are provided
       - name: Log in to Docker Hub
-        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        run: echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
+        if: ${{ env.mahesh206 != '' && env.karuppiah114 != '' }}
+        run: echo "${{ env.karuppiah114 }}" | docker login -u "${{ env.mahesh206 }}" --password-stdin
 
       # Push Docker images if credentials are provided
       - name: Push Docker images
-        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
+        if: ${{ env.mahesh206 != '' && env.karuppiah114 != '' }}
         run: docker compose push
