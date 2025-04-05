@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import ProductList from './pages/ProductListPage';
-import ProductDetailPage from './pages/ProductDetailPage'; // Updated import
+import ProductDetailPage from './pages/ProductDetailPage'; // Consolidated Product Detail Page
 
 function App() {
   return (
