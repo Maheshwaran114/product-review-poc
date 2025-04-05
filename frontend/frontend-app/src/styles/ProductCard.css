@@ -1,0 +1,33 @@
+/* ProductCard.css */
+
+/* Container styling for the product card */
+.product-card {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-medium);
+    margin: var(--spacing-small);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+  
+  /* Hover effect for interactivity */
+  .product-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px var(--shadow-color);
+  }
+  
+  /* Heading styling inside the product card */
+  .product-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-small);
+  }
+  
+  /* Paragraph styling for product description and price */
+  .product-card p {
+    margin-bottom: var(--spacing-small);
+    font-size: 1rem;
+    color: #555;
+  }
+  

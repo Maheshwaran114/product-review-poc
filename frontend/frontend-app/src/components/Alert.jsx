@@ -1,5 +1,5 @@
 import React from 'react';
-import './Alert.css';
+import '../styles/Alert.css';
 
 const Alert = ({ type = 'success', message }) => {
   if (!message) return null;

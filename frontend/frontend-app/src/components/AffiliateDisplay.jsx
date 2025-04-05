@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AffiliateDisplay.css';
+import '../styles/AffiliateDisplay.css';
 
 const AffiliateDisplay = ({ token, userId }) => {
   const [copied, setCopied] = useState(false);
