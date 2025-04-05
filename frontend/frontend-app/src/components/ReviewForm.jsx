@@ -4,6 +4,7 @@ import { submitReview } from '../services/api';
 import '../styles/ReviewForm.css';
 
 const ReviewForm = ({ productId, onSuccess }) => {
+  const [userId, setUserId] = useState(''); // Temporary field for testing
   const [rating, setRating] = useState('');
   const [comment, setComment] = useState('');
   const [error, setError] = useState(null);
@@ -16,11 +17,13 @@ const ReviewForm = ({ productId, onSuccess }) => {
     setMessage('');
     setLoading(true);
     try {
-      await submitReview(productId, { rating, comment });
+      // Include userId in the payload temporarily
+      await submitReview(productId, { userId, rating, comment });
       setMessage('Review submitted successfully!');
+      setUserId('');  // Clear userId field after submission
       setRating('');
       setComment('');
-      onSuccess(); // Refresh reviews
+      onSuccess(); // Refresh reviews after successful submission
     } catch (err) {
       setError(err.message);
     }
@@ -29,6 +32,15 @@ const ReviewForm = ({ productId, onSuccess }) => {
 
   return (
     <form className="review-form" onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label>User ID:</label>
+        <input
+          type="text"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          required
+        />
+      </div>
       <div className="form-group">
         <label>Rating:</label>
         <input
@@ -48,7 +60,9 @@ const ReviewForm = ({ productId, onSuccess }) => {
           required
         />
       </div>
-      <button type="submit" disabled={loading}>Submit Review</button>
+      <button type="submit" disabled={loading}>
+        Submit Review
+      </button>
       {loading && <p>Submitting review...</p>}
       {error && <p className="error">{error}</p>}
       {message && <p className="success">{message}</p>}

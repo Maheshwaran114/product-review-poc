@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
-import { fetchProducts } from '../services/api';
 import '../styles/ProductList.css';
 
 const ProductList = () => {
@@ -18,46 +17,64 @@ const ProductList = () => {
   const loader = useRef(null);
   const navigate = useNavigate();
 
-  const loadProducts = async (reset = false) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchProducts({ page, limit, search });
-      if (reset) {
+  // Effect to handle search changes explicitly (always fetch page 1)
+  useEffect(() => {
+    const fetchForSearch = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        let url = `/api/products?page=1&limit=${limit}`;
+        if (search) {
+          url += `&search=${encodeURIComponent(search)}`;
+        }
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
         setProducts(data);
-      } else {
-        setProducts(prev => [...prev, ...data]);
+        setHasMore(data.length === limit);
+        setPage(1);
+      } catch (err) {
+        setError(err.message);
       }
-      setHasMore(data.length === limit);
-    } catch (err) {
-      setError(err.message);
-    }
-    setLoading(false);
-  };
+      setLoading(false);
+    };
+    fetchForSearch();
+  }, [search, limit]);
 
-  // When search changes, reset products, page, and fetch new data
+  // Effect to load additional products when page increases (for pages > 1)
   useEffect(() => {
-    setProducts([]);
-    setPage(1);
-    setHasMore(true);
-    loadProducts(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+    if (page === 1) return; // Page 1 is already fetched in the search effect
+    const loadMore = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        let url = `/api/products?page=${page}&limit=${limit}`;
+        if (search) {
+          url += `&search=${encodeURIComponent(search)}`;
+        }
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
+        setProducts(prev => [...prev, ...data]);
+        setHasMore(data.length === limit);
+      } catch (err) {
+        setError(err.message);
+      }
+      setLoading(false);
+    };
+    loadMore();
+  }, [page, limit, search]);
 
-  // Load more products when page changes (for page > 1)
-  useEffect(() => {
-    if (page > 1) {
-      loadProducts();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
-
-  // Intersection Observer for infinite scroll
+  // Intersection Observer for infinite scrolling
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore && !loading) {
-          console.log('Loader visible. Fetching next page...');
+          console.log('Loader is visible. Fetching next page...');
           setPage(prev => prev + 1);
         }
       },
@@ -76,7 +93,7 @@ const ProductList = () => {
     };
   }, [hasMore, loading]);
 
-  // Handle search action from SearchBar
+  // Handle search action from the SearchBar
   const handleSearch = (query) => {
     setSearch(query);
   };
@@ -107,6 +124,8 @@ const ProductList = () => {
 
       {error && <p className="error">{error}</p>}
       {loading && <p>Loading...</p>}
+      
+      {/* Loader element for triggering infinite scroll */}
       <div ref={loader} className="loader" style={{ height: '50px', backgroundColor: 'rgba(255,0,0,0.2)' }}></div>
     </div>
   );
