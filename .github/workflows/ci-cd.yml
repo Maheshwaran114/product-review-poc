@@ -1,3 +1,11 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -8,7 +16,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      # Backend steps with updated Node version
+      # Backend steps
       - name: Set up Node for backend
         uses: actions/setup-node@v2
         with:
@@ -20,11 +28,11 @@ jobs:
         working-directory: backend
         run: npm test
 
-      # Frontend steps (if needed, update version similarly)
+      # Frontend steps
       - name: Set up Node for frontend
         uses: actions/setup-node@v2
         with:
-          node-version: '18.18'  # or '18' if your frontend works fine with 18.x
+          node-version: '18.18'
       - name: Install dependencies (frontend)
         working-directory: frontend/frontend-app
         run: npm install
@@ -32,13 +40,16 @@ jobs:
         working-directory: frontend/frontend-app
         run: npm test
 
+      # Build Docker images using Docker Compose
       - name: Build Docker images
         run: docker-compose build
 
+      # Log in to Docker Hub if credentials are provided
       - name: Log in to Docker Hub
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         run: echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
 
+      # Push Docker images if credentials are provided
       - name: Push Docker images
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         run: docker-compose push
