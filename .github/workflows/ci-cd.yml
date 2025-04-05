@@ -42,7 +42,7 @@ jobs:
 
       # Build Docker images using Docker Compose
       - name: Build Docker images
-        run: docker-compose build
+        run: docker compose build
 
       # Log in to Docker Hub if credentials are provided
       - name: Log in to Docker Hub
@@ -52,4 +52,4 @@ jobs:
       # Push Docker images if credentials are provided
       - name: Push Docker images
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        run: docker-compose push
+        run: docker compose push
