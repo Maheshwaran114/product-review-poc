@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [ "main" ]     # or the branch(es) you want to build on push
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]     # or the branch(es) you want to build on PR
+    branches: [ "main" ]
 
 jobs:
   build-and-test:
@@ -12,53 +12,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Check out the repository code
       - name: Check out code
         uses: actions/checkout@v2
 
-      # 2. Set up Node.js (for running npm commands)
       - name: Set up Node
         uses: actions/setup-node@v2
         with:
-          node-version: 16  # or whichever version you require
+          node-version: 16
 
-      # 3. Install dependencies & run tests (example for frontend or combined monorepo)
       - name: Install dependencies
         run: npm install
 
       - name: Run tests
         run: npm test
 
-      # 4. Build the Docker images (using Docker Compose or Docker CLI)
       - name: Build Docker images
-        run: |
-          docker-compose build
-          # or: docker build -t your-frontend-image -f Dockerfile.frontend .
-          #      docker build -t your-backend-image -f Dockerfile.backend .
+        run: docker-compose build
 
-      # 5. (Optional) Log in to Docker registry & push images
-      #    Replace with your own registry credentials (Docker Hub, GHCR, etc.)
-      #    Make sure DOCKER_USERNAME and DOCKER_PASSWORD (or TOKEN) are set in your repo's secrets.
       - name: Log in to Docker Hub
-        if: ${{ secrets.DOCKER_USERNAME && secrets.DOCKER_PASSWORD }}
+        if: ${{ secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != '' }}
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Push Docker images
-        if: ${{ secrets.DOCKER_USERNAME && secrets.DOCKER_PASSWORD }}
-        run: |
-          # Example push commands; adjust tags as needed
-          docker-compose push
-          # or: docker push your-frontend-image
-          #      docker push your-backend-image
-
-  # (Optional) Deploy job - only if you have an automated deployment step
-  # For example, a job to deploy images to a staging or production server.
-  # deploy:
-  #   name: Deploy
-  #   needs: build-and-test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check out code
-  #       uses: actions/checkout@v2
-  #     # ... additional steps to pull images, run containers, etc.
+        if: ${{ secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != '' }}
+        run: docker-compose push
