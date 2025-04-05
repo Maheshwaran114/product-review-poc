@@ -1,5 +1,5 @@
 import React from 'react';
-import './ReviewList.css';
+import '../styles/ReviewList.css';
 
 const ReviewList = ({ reviews }) => {
   if (!reviews || reviews.length === 0) {

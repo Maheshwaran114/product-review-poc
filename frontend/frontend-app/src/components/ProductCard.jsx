@@ -1,15 +1,9 @@
 import React from 'react';
-import '../styles/ProductCard.css';
+import './ProductCard.css';
 
 const ProductCard = ({ product, onClick }) => {
   return (
-    <div
-      className="product-card"
-      onClick={() => onClick(product.id)}
-      role="button"
-      tabIndex={0}
-      onKeyPress={(e) => e.key === 'Enter' && onClick(product.id)}
-    >
+    <div className="product-card" role="button" tabIndex={0} onClick={() => onClick(product.id)}>
       <h3>{product.name}</h3>
       <p>{product.description}</p>
       <p><strong>Price:</strong> ${product.price.toFixed(2)}</p>
