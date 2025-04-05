@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm';
 import SearchBar from '../components/SearchBar';
+import { fetchProductById } from '../services/api';
 import '../styles/ProductDetail.css';
-import '../styles/ReviewForm.css';
-import '../styles/SearchBar.css';
 
 const ProductDetailPage = () => {
-  const { id } = useParams(); // Get product id from URL parameters
+  const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -16,21 +15,17 @@ const ProductDetailPage = () => {
   const [errorProduct, setErrorProduct] = useState(null);
   const [errorReviews, setErrorReviews] = useState(null);
 
-  // Handle search action by navigating to the product list with a search query
+  // Handle search action to navigate back to product list with a search query
   const handleSearch = (query) => {
     navigate(`/products?search=${encodeURIComponent(query)}`);
   };
 
-  // Fetch product details from the API
+  // Fetch product details from API
   const fetchProduct = async () => {
     setLoadingProduct(true);
     setErrorProduct(null);
     try {
-      const res = await fetch(`/api/products/${id}`);
-      if (!res.ok) {
-        throw new Error('Failed to fetch product');
-      }
-      const data = await res.json();
+      const data = await fetchProductById(id);
       setProduct(data);
     } catch (err) {
       setErrorProduct(err.message);
@@ -38,7 +33,7 @@ const ProductDetailPage = () => {
     setLoadingProduct(false);
   };
 
-  // Fetch reviews for the product from the API
+  // Fetch reviews from API
   const fetchReviews = async () => {
     setLoadingReviews(true);
     setErrorReviews(null);
@@ -55,7 +50,6 @@ const ProductDetailPage = () => {
     setLoadingReviews(false);
   };
 
-  // Run fetch operations when the component mounts or when the id changes
   useEffect(() => {
     fetchProduct();
     fetchReviews();
@@ -63,12 +57,10 @@ const ProductDetailPage = () => {
 
   return (
     <div className="product-detail">
-      {/* Container for the SearchBar */}
       <div className="search-container">
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      {/* Back button for navigation */}
       <button onClick={() => navigate(-1)} className="back-button">
         Back to Products
       </button>
@@ -116,7 +108,6 @@ const ProductDetailPage = () => {
 
       <div className="review-form-section">
         <h3>Submit a Review</h3>
-        {/* Refetch reviews on successful review submission */}
         <ReviewForm productId={id} onSuccess={fetchReviews} />
       </div>
     </div>
