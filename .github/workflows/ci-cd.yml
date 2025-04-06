@@ -54,7 +54,8 @@ jobs:
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         run: docker compose push
 
+      # Debug step to print Docker credentials (without exposing sensitive info)
       - name: Debug Docker Credentials
         run: |
-        echo "Docker Username: $DOCKER_USERNAME"
-        echo "Docker Password is set: $([ -n "$DOCKER_PASSWORD" ] && echo yes || echo no)"
+          echo "Docker Username: $DOCKER_USERNAME"
+          echo "Docker Password is set: $([ -n "$DOCKER_PASSWORD" ] && echo yes || echo no)"
