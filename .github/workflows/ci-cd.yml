@@ -53,3 +53,8 @@ jobs:
       - name: Push Docker images
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         run: docker compose push
+
+      - name: Debug Docker Credentials
+        run: |
+        echo "Docker Username: $DOCKER_USERNAME"
+        echo "Docker Password is set: $([ -n "$DOCKER_PASSWORD" ] && echo yes || echo no)"
