@@ -10,8 +10,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_USERNAME: ${{ secrets.mahesh206 }}
+      DOCKER_PASSWORD: ${{ secrets.karuppiah114 }}
     steps:
       - name: Check out code
         uses: actions/checkout@v2
