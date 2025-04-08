@@ -25,7 +25,7 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile.backend
     container_name: product-review-backend
     restart: always
@@ -37,21 +37,25 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgres://postgres:admin@postgres-db:5432/product_review_db
+    # Mount only the backend source folder so that the container sees the backend code
     volumes:
-      - ./backend:/app
+      - ./backend:/app/backend
     networks:
       - app-network
 
   frontend:
     build:
-      context: ./frontend/frontend-app
+      context: .
       dockerfile: Dockerfile.frontend
     container_name: product-review-frontend
     restart: always
     ports:
-      - "3000:80"  # Exposes container port 80 as port 3000 on the host
+      - "3000:80"  # Expose Nginx port 80 as port 3000 on the host
     depends_on:
       - backend
+    # Mount the frontend source folder
+    volumes:
+      - ./frontend/frontend-app:/app/frontend
     networks:
       - app-network
 
