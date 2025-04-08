@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   build-and-test:
@@ -44,9 +44,9 @@ jobs:
       - name: Check Docker Compose Version
         run: docker compose version
 
-      # Build Docker images using Docker Compose with verbose output and no cache
+      # Build Docker images using Docker Compose with no cache and plain progress output
       - name: Build Docker images
-        run: docker compose build --verbose --no-cache
+        run: docker compose build --no-cache --progress=plain
 
       # Log in to Docker Hub if credentials are provided
       - name: Log in to Docker Hub
