@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-and-test:
@@ -40,9 +40,13 @@ jobs:
         working-directory: frontend/frontend-app
         run: npm test
 
-      # Build Docker images using Docker Compose
+      # Debug: Check Docker Compose Version
+      - name: Check Docker Compose Version
+        run: docker compose version
+
+      # Build Docker images using Docker Compose with verbose output and no cache
       - name: Build Docker images
-        run: docker compose build
+        run: docker compose build --verbose --no-cache
 
       # Log in to Docker Hub if credentials are provided
       - name: Log in to Docker Hub
