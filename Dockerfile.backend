@@ -1,24 +1,29 @@
-# Use official Node.js image
-FROM node:18-alpine
-
-# Set working directory
+# Stage 1: Build
+FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy only package files first to leverage Docker cache
 COPY package*.json ./
-RUN npm install -g prisma
+RUN npm install
 
 # Copy the rest of the backend source code
 COPY . .
 
-# Ensure environment variables are available inside container
-ENV NODE_ENV=development
-
-# Generate Prisma client
+# Generate the Prisma client using the schema from the backend folder
 RUN npx prisma generate --schema=./backend/prisma/schema.prisma
 
-# Expose the port the backend will run on
+# Stage 2: Production Image
+FROM node:18-alpine
+WORKDIR /app
+
+# Copy built files from the builder stage
+COPY --from=builder /app .
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Expose the backend port
 EXPOSE 3001
 
-# Start the application
-CMD ["npm", "run", "dev"]
+# Start the application (ensure your package.json has a "start" script for production)
+CMD ["npm", "run", "start"]
