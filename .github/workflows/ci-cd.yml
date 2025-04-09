@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["develop"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["develop"]
 
 jobs:
   build-and-test:
@@ -16,7 +16,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      # Backend steps
+      # Backend Build and Test
       - name: Set up Node for backend
         uses: actions/setup-node@v2
         with:
@@ -28,7 +28,7 @@ jobs:
         working-directory: backend
         run: npm test
 
-      # Frontend steps
+      # Frontend Build and Test
       - name: Set up Node for frontend
         uses: actions/setup-node@v2
         with:
@@ -40,26 +40,37 @@ jobs:
         working-directory: frontend/frontend-app
         run: npm test
 
-      # Debug: Check Docker Compose Version
-      - name: Check Docker Compose Version
-        run: docker compose version
-
-      # Build Docker images using Docker Compose with no cache and plain progress output
+      # Build Docker Images
       - name: Build Docker images
         run: docker compose build --no-cache --progress=plain
 
-      # Log in to Docker Hub if credentials are provided
-      - name: Log in to Docker Hub
-        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        run: echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
+  integration-deploy-and-test:
+    name: Integration Deploy & Test
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      # Push Docker images if credentials are provided
-      - name: Push Docker images
-        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        run: docker compose push
-
-      # Debug step to print Docker credentials (without exposing sensitive info)
-      - name: Debug Docker Credentials
+      # Deploy Integration Environment (using an override file if needed)
+      - name: Deploy Integration Environment
         run: |
-          echo "Docker Username: $DOCKER_USERNAME"
-          echo "Docker Password is set: $([ -n "$DOCKER_PASSWORD" ] && echo yes || echo no)"
+          docker compose -f docker-compose.yml -f docker-compose.integration.yml up -d
+
+      # Wait for Services to Become Healthy
+      - name: Wait for Services
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 30
+
+      # Run Integration Tests
+      - name: Run Integration Tests
+        run: |
+          cd frontend/frontend-app
+          npm run integration-test
+
+      # Tear Down Integration Environment
+      - name: Tear Down Integration Environment
+        if: always()
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.integration.yml down

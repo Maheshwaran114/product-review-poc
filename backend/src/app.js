@@ -9,6 +9,11 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
+// Health-check route
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Sample route
 app.get('/', (req, res) => {
   res.send('Hello from the backend!');
@@ -19,7 +24,7 @@ app.use('/api', apiRoutes);
 
 // 404 handler for unknown routes
 app.use((req, res, next) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({ error:  'Route not found' });
 });
 
 // Global error handler
